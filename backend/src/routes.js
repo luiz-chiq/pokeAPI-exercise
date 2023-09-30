@@ -22,8 +22,6 @@ routes.post('/signup', (req, res) => {
 routes.post('/login', (req, res) => {
     const{email, password} = req.body
     const user = users.find(user=>user.email === email && user.password === password)
-    console.log(req)
-    console.log(req.body)
 
     if(user){
         req.session.authenticated = true;
@@ -37,12 +35,25 @@ routes.post('/login', (req, res) => {
 });
 
 routes.get('/perfil', requireAuth, (req, res) => {
-    res.json(req.session.user);
-  });
+    return res.json(req.session.user);
+});
 
 routes.get('/getUsers', (req, res) => {
     return res.status(200).json(users)
 });
 
+routes.post('/addPokemon', requireAuth, (req, res) => {
+    if (!req.session.user) {
+        return res.status(401).json({ message: 'Usuário não autenticado' });
+    }
+    const user = users.find(user => user.email === req.session.user.email);
+    
+    const novoPokemon = req.body.pokemon;
+    novoPokemon.id = user.pokemons.length + 1;
+    
+    user.pokemons.push(novoPokemon);
 
-module.exports = routes;
+    return res.status(200).json({ message: 'Pokémon adicionado com sucesso'});
+});
+
+module.exports = routes;    
