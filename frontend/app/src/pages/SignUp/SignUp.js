@@ -1,6 +1,7 @@
 
 import { useState } from "react"
 import axios from 'axios'
+import {useNavigate} from 'react-router-dom';
 
 function SignUp() {
 
@@ -8,20 +9,28 @@ function SignUp() {
     const [password, setPassword] = useState('');
     const [name, setName] = useState('');
     
+    const navigate = useNavigate();
+
+    const navigateToProfile = () => {
+        navigate('/profile');
+    };
+
+    const navigateToLogin = () => {
+        navigate('/');
+    };
+
     const handleSignUp = async (e) => {
         e.preventDefault();
         try {
-            console.log("A")
             const response = await axios.post('http://localhost:3004/signup', {
                 email,
                 name,
                 password
             });
-            console.log(response.status)
 
             if (response.status === 200) {
-                console.log(response.data);
                 console.log('Cadastro bem-sucedido!');
+                navigateToProfile()
             } else {
                 console.log('Falha ao fazer cadastro.');
             }
@@ -29,24 +38,6 @@ function SignUp() {
             console.error('Erro ao fazer cadastro:', error);
         }
     };
-
-    const aaaa = async (e) => {
-        e.preventDefault();
-    
-        try {
-            const response = await axios.get('http://localhost:3004/getUsers');
-            
-            if (response.status === 200) {
-                console.log('Requisição bem-sucedida');
-                console.log(response.data);
-            } else {
-                console.error('Requisição mal-sucedida com status:', response.status);
-            }
-        } catch (error) {
-            console.log("b", error);
-        }
-    }
-
 
 
     return (
@@ -87,15 +78,13 @@ function SignUp() {
                 type="submit"
                 className='btn-login' 
                 onClick={(e) => handleSignUp(e)}
-            >Entrar</button>
+            >Cadastrar</button>
         </form>
-        <form>
         <button
                 type="submit"
                 className='btn-login' 
-                onClick={(e) => aaaa(e)}
-            >aaa</button>
-        </form>
+                onClick={(e) => navigateToLogin()}
+        >Já tenho login</button>
       </div>
 
     )
