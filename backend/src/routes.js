@@ -2,7 +2,7 @@ const express = require('express');
 
 const routes = express.Router();
 
-const requireAuth = require('./middleware/requireAuth');
+// const requireAuth = require('./middleware/requireAuth');
 
 const users = [];
 
@@ -23,7 +23,7 @@ routes.post('/signup', (req, res) => {
         newUser.pokemons = [];
         users.push(newUser);
       
-        res.status(200).json(newUser);
+        res.status(200).json({ message: `Cadastro de ${newUser.email} feito com sucesso`});
 });
 
 routes.post('/login', (req, res) => {
@@ -35,19 +35,26 @@ routes.post('/login', (req, res) => {
         // req.session.cookie.login = user.email
         // console.log(req.session)
         authUser = user.email
-        return res.status(200).json(user)
+        return res.status(200).json({ message: `Login de ${user.email} feito com sucesso`});
     }
     return res.status(401).json({ message: 'Credenciais inválidas' });
 
 });
 
+routes.post('/logout', (req, res) => {
+        authUser = undefined
+        return res.status(200).json({ message: 'Logout feito com sucesso' })
+});
+
+
+//rota de teste
 // routes.get('/perfil', requireAuth, (req, res) => {
 routes.get('/perfil', (req, res) => {
     // console.log(req.session.user)
     // return res.status(200).json(req.session.user);
     return res.status(200).json(authUser);
 });
-
+//rota de teste
 routes.get('/getUsers', (req, res) => {
     // console.log(req.session.authenticated)
     // console.log(req.session.cookie)
