@@ -1,11 +1,23 @@
 
 import { useState } from "react"
 import axios from 'axios'
+import {useNavigate} from 'react-router-dom';
+import './style.css';
 
 function Login() {
 
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
+
+    const navigate = useNavigate();
+
+    const navigateToProfile = () => {
+        navigate('/profile');
+    };
+
+    const navigateToSignUp = () => {
+        navigate('/signUp');
+    };
 
     const handleLogin = async (e) => {
         e.preventDefault();
@@ -18,6 +30,7 @@ function Login() {
             if (response.status === 200) {
                 console.log(response.data);
                 console.log('Login bem-sucedido!');
+                navigateToProfile()
             } else {
                 console.log('Falha ao fazer login.');
             }
@@ -25,27 +38,7 @@ function Login() {
             console.error('Erro ao fazer login:', error);
         }
     };
-
-    const aaaa = async (e) => {
-        e.preventDefault();
-    
-        try {
-            const response = await axios.get('http://localhost:3004/perfil');
-            
-            if (response.status === 200) {
-                console.log('Requisição bem-sucedida');
-                console.log(response.data);
-            } else {
-                console.error('Requisição mal-sucedida com status:', response.status);
-            }
-        } catch (error) {
-            console.log("b", error);
-        }
-    }
         
-
-
-
     return (
         <div>
         <h2>Formulário de Login</h2>
@@ -76,13 +69,11 @@ function Login() {
                 onClick={(e) => handleLogin(e)}
             >Entrar</button>
         </form>
-        <form>
-            <button
-            type="submit"
+        <button
+                type="submit"
                 className='btn-login' 
-                onClick={(e) => aaaa(e)}
-            > aaaa </button>
-        </form>
+                onClick={(e) => navigateToSignUp()}
+            >Cadastrar</button>
       </div>
     )
 }
