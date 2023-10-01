@@ -6,12 +6,19 @@ const requireAuth = require('./middleware/requireAuth');
 
 const users = [];
 
+var authUser = undefined
+
 routes.post('/signup', (req, res) => {
         const newUser = req.body;
       
         if (!newUser || !newUser.name || !newUser.email || !newUser.password) {
           return res.status(400).json({ error: 'Dados do usuário inválidos' });
         }
+        const user = users.find(user=>user.email === newUser.email)
+        if (user) {
+            return res.status(409).json({ error: 'Email já cadastrado' });
+          }
+
         newUser.id = users.length + 1;
         newUser.pokemons = [];
         users.push(newUser);
@@ -24,31 +31,38 @@ routes.post('/login', (req, res) => {
     const user = users.find(user=>user.email === email && user.password === password)
 
     if(user){
-        req.session.authenticated = true;
-        req.session.user = {
-            email: user.email
-        };
-        console.log(email)
+        // req.session.authenticated = true;
+        // req.session.cookie.login = user.email
+        // console.log(req.session)
+        authUser = user.email
         return res.status(200).json(user)
     }
     return res.status(401).json({ message: 'Credenciais inválidas' });
 
 });
 
-routes.get('/perfil', requireAuth, (req, res) => {
-    return res.json(req.session.user);
+// routes.get('/perfil', requireAuth, (req, res) => {
+routes.get('/perfil', (req, res) => {
+    // console.log(req.session.user)
+    // return res.status(200).json(req.session.user);
+    return res.status(200).json(authUser);
 });
 
 routes.get('/getUsers', (req, res) => {
+    // console.log(req.session.authenticated)
+    // console.log(req.session.cookie)
     return res.status(200).json(users)
 });
 
-routes.post('/addPokemon', requireAuth, (req, res) => {
-    if (!req.session.user) {
+// routes.post('/addPokemon', requireAuth, (req, res) => {
+routes.post('/addPokemon', (req, res) => {
+    // if (!req.session.user) {
+    if (!authUser) {
+        console.log("nao logado")
         return res.status(401).json({ message: 'Usuário não autenticado' });
     }
-    const user = users.find(user => user.email === req.session.user.email);
-    
+    // const user = users.find(user => user.email === req.session.user.email);
+    const user = users.find(user => user.email === authUser);
     const novoPokemon = req.body.pokemon;
     novoPokemon.id = user.pokemons.length + 1;
     
@@ -57,11 +71,14 @@ routes.post('/addPokemon', requireAuth, (req, res) => {
     return res.status(200).json({ message: 'Pokémon adicionado com sucesso'});
 });
 
-routes.get('/getUserPokemons', requireAuth, (req, res) => {
-    if (!req.session.user) {
+// routes.get('/getUserPokemons', requireAuth, (req, res) => {
+routes.get('/getUserPokemons', (req, res) => {
+    // if (!req.session.user) {
+    if (!authUser) {
         return res.status(401).json({ message: 'Usuário não autenticado' });
     }
-    const user = users.find(user => user.email === req.session.user.email);
+    // const user = users.find(user => user.email === req.session.user.email);
+    const user = users.find(user => user.email === authUser);
 
     res.status(200).json(user.pokemons)
 });
