@@ -49,9 +49,12 @@ routes.post('/logout', (req, res) => {
 
 //rota de teste
 // routes.get('/perfil', requireAuth, (req, res) => {
-routes.get('/perfil', (req, res) => {
+routes.get('/profile', (req, res) => {
     // console.log(req.session.user)
     // return res.status(200).json(req.session.user);
+    if(!authUser){  
+        return res.status(401).json({message: 'sem usuário logado'});
+    }
     return res.status(200).json(authUser);
 });
 //rota de teste
@@ -65,15 +68,21 @@ routes.get('/getUsers', (req, res) => {
 routes.post('/addPokemon', (req, res) => {
     // if (!req.session.user) {
     if (!authUser) {
-        console.log("nao logado")
         return res.status(401).json({ message: 'Usuário não autenticado' });
     }
     // const user = users.find(user => user.email === req.session.user.email);
     const user = users.find(user => user.email === authUser);
-    const novoPokemon = req.body.pokemon;
-    novoPokemon.id = user.pokemons.length + 1;
+    // const newPokemon = req.body.pokemon;
+    const newPokemon = {
+        id: user.pokemons.length + 1,
+        name: req.body.name,
+        nickName: req.body.nickName,
+        types: req.body.types,
+        imageUrl: req.body.imageUrl,    
+    }
     
-    user.pokemons.push(novoPokemon);
+    user.pokemons.push(newPokemon);
+    console.log(user.pokemons)
 
     return res.status(200).json({ message: 'Pokémon adicionado com sucesso'});
 });
